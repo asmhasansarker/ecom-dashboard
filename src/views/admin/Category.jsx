@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable jsx-a11y/scope */
 /* eslint-disable react/jsx-no-comment-textnodes */
-import React, {  useState } from 'react'
+import React, {  useEffect, useState } from 'react'
 import { FaEdit, FaTrash } from 'react-icons/fa'
 import { PropagateLoader } from 'react-spinners'
 import { overrideStyle } from '../../utils/utils'
@@ -9,13 +9,13 @@ import { GrClose } from 'react-icons/gr'
 import { Link } from 'react-router-dom'
 import Pagination from '../Pagination'
 import { BsImage } from 'react-icons/bs'
-// import toast from 'react-hot-toast'
-// import { useSelector, useDispatch } from 'react-redux'
+import toast from 'react-hot-toast'
+import { useSelector, useDispatch } from 'react-redux'
 import Search from '../components/Search'
-// import { categoryAdd, messageClear, get_category } from '../../store/Reducers/categoryReducer'
+import { categoryAdd, messageClear, get_category } from '../../store/Reducers/categoryReducer'
 const Category = () => {
-    // const dispatch = useDispatch()
-    // const { loader, successMessage, errorMessage, categorys } = useSelector(state => state.category)
+    const dispatch = useDispatch()
+    const { loader, successMessage, errorMessage, categorys } = useSelector(state => state.category)
     const [currentPage, setCurrentPage] = useState(1)
     const [searchValue, setSearchValue] = useState('')
     const [parPage, setParPage] = useState(5)
@@ -26,8 +26,7 @@ const Category = () => {
         image: ''
     })
 
-    const loader = false;
-    // loader need from backend 
+  
     const imageHandle = (e) => {
         let files = e.target.files
         if (files.length > 0) {
@@ -38,35 +37,38 @@ const Category = () => {
             })
         }
     }
-    // const add_category = (e) => {
-    //     e.preventDefault()
-    //     dispatch(categoryAdd(state))
-    // }
+    const add_category = (e) => {
+        e.preventDefault()
+        dispatch(categoryAdd(state))
+        
+    }
 
-    // useEffect(() => {
-    //     if (errorMessage) {
-    //         toast.error(errorMessage)
-    //         dispatch(messageClear())
-    //     }
-    //     if (successMessage) {
-    //         toast.success(successMessage)
-    //         dispatch(messageClear())
-    //         setState({
-    //             name: '',
-    //             image: ''
-    //         })
-    //         setImage('')
-    //     }
-    // }, [successMessage, errorMessage])
+    useEffect(() => {
+        if (errorMessage) {
+            toast.error(errorMessage)
+            dispatch(messageClear())
+        }
+        if (successMessage) {
+            toast.success(successMessage)
+            dispatch(messageClear())
+            setState({
+                name: '',
+                image: ''
+            })
+            setImage('')
+        }
+    }, [successMessage, errorMessage])
 
-    // useEffect(() => {
-    //     const obj = {
-    //         parPage: parseInt(parPage),
-    //         page: parseInt(currentPage),
-    //         searchValue
-    //     }
-    //     dispatch(get_category(obj))
-    // }, [searchValue, currentPage, parPage])
+    useEffect(() => {
+        const obj = {
+            parPage: parseInt(parPage),
+            page: parseInt(currentPage),
+            searchValue
+        }
+        dispatch(get_category(obj))
+    }, [searchValue, currentPage, parPage])
+
+     
     return (
         <div className='px-2 lg:px-7 pt-5'>
             <div className='flex lg:hidden justify-between items-center mb-5 p-4 bg-[#283046] rounded-md'>
@@ -89,14 +91,14 @@ const Category = () => {
                                 </thead>
                                 <tbody>
                                     {
-                                        [1,2,3,4,5].map((d, i) => <tr key={i}>
+                                        categorys.map((d, i) => <tr key={i}>
                                             
                                             <td scope='row' className='py-1 px-4 font-medium whitespace-nowrap'>{i + 1}</td>
                                             <td scope='row' className='py-1 px-4 font-medium whitespace-nowrap'>
-                                                <img className='w-[45px] h-[45px]' src={`http://localhost:3000/images/category/${d}.jpg`} alt="" />
+                                                <img className='w-[45px] h-[45px]' src={d.image} alt="" />
                                             </td>
                                             <td scope='row' className='py-1 px-4 font-medium whitespace-nowrap'>
-                                                <span>Sports</span>
+                                                <span>{d.name}</span>
                                             </td>
                                             <td scope='row' className='py-1 px-4 font-medium whitespace-nowrap'>
                                                 <div className='flex justify-start items-center gap-4'>
@@ -127,7 +129,7 @@ const Category = () => {
                                 <h1 className='text-[#d0d2d6] font-semibold text-xl'>Add Category</h1>
                                 <div onClick={() => setShow(false)} className='block lg:hidden cursor-pointer'><GrClose className='text-[#d0d2d6]' /></div>
                             </div>
-                            <form >
+                            <form onSubmit={add_category}>
                                 <div className='flex flex-col w-full gap-1 mb-3'>
                                     <label htmlFor="name">Category name</label>
                                     <input value={state.name} onChange={(e) => setState({ ...state, name: e.target.value })} className='px-4 py-2 focus:border-indigo-500 outline-none bg-[#283046] border border-slate-700 rounded-md text-[#d0d2d6]' type="text" id='name' name='category_name' placeholder='category name' required />
